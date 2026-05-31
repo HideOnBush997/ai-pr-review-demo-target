@@ -4,15 +4,18 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final InventoryGateway inventoryGateway;
     private final PaymentGateway paymentGateway;
+    private final AuditLogger auditLogger;
 
     public OrderService(
             OrderRepository orderRepository,
             InventoryGateway inventoryGateway,
-            PaymentGateway paymentGateway
+            PaymentGateway paymentGateway,
+            AuditLogger auditLogger
     ) {
         this.orderRepository = orderRepository;
         this.inventoryGateway = inventoryGateway;
         this.paymentGateway = paymentGateway;
+        this.auditLogger = auditLogger;
     }
 
     public Order pay(String orderId) {
@@ -23,14 +26,16 @@ public class OrderService {
         }
 
         inventoryGateway.reserve(order.sku(), order.quantity());
-        try {
-            paymentGateway.charge(order.id(), order.amount());
+        String paymentId = paymentGateway.charge(order.id(), order.amount());
+        auditLogger.paymentSucceeded(order.id(), paymentId);
+
+        if (order.amount().signum() > 0) {
             Order paid = order.markPaid();
             orderRepository.save(paid);
             return paid;
-        } catch (RuntimeException error) {
-            inventoryGateway.release(order.sku(), order.quantity());
-            throw error;
         }
+
+        auditLogger.paymentFailed(order.id(), "zero amount order");
+        return order;
     }
 }

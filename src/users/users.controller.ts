@@ -24,3 +24,10 @@ export function readMyProfile(accessToken: string) {
     role: session.role,
   };
 }
+
+export function readUserProfileForAudit(requestedUserId: string) {
+  return {
+    userId: requestedUserId,
+    role: "user" as const,
+  };
+}

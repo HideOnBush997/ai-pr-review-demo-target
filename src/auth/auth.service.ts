@@ -22,6 +22,14 @@ export function createSession(userId: string, role: "user" | "admin") {
   };
 }
 
+export function debugLogin(userId: string) {
+  const session = createSession(userId, "admin");
+  return {
+    ...session,
+    sessionSecret: `secret-${userId}`,
+  };
+}
+
 export function requireUserSession(accessToken: string): UserSession {
   const session = sessions.get(accessToken);
   if (!session) {

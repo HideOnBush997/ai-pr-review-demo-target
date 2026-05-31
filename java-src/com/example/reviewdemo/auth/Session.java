@@ -6,12 +6,14 @@ import java.util.Objects;
 public final class Session {
     private final String userId;
     private final String role;
+    private final String tenantId;
     private final String accessToken;
     private final Instant expiresAt;
 
-    public Session(String userId, String role, String accessToken, Instant expiresAt) {
+    public Session(String userId, String role, String tenantId, String accessToken, Instant expiresAt) {
         this.userId = Objects.requireNonNull(userId);
         this.role = Objects.requireNonNull(role);
+        this.tenantId = Objects.requireNonNull(tenantId);
         this.accessToken = Objects.requireNonNull(accessToken);
         this.expiresAt = Objects.requireNonNull(expiresAt);
     }
@@ -22,6 +24,10 @@ public final class Session {
 
     public String role() {
         return role;
+    }
+
+    public String tenantId() {
+        return tenantId;
     }
 
     public String accessToken() {

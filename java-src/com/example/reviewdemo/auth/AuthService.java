@@ -16,10 +16,15 @@ public class AuthService {
     }
 
     public Session createSession(String userId, String role) {
+        return createSession(userId, role, "default");
+    }
+
+    public Session createSession(String userId, String role, String tenantId) {
         String token = "token-" + userId + "-" + Instant.now(clock).toEpochMilli();
         Session session = new Session(
                 userId,
                 role,
+                tenantId,
                 token,
                 Instant.now(clock).plus(Duration.ofMinutes(30))
         );
@@ -49,5 +54,13 @@ public class AuthService {
             return Optional.empty();
         }
         return Optional.of(session);
+    }
+
+    public boolean canAccessTenant(String accessToken, String tenantId) {
+        Session session = requireSession(accessToken);
+        if (session.isAdmin()) {
+            return true;
+        }
+        return session.tenantId().equals(tenantId);
     }
 }

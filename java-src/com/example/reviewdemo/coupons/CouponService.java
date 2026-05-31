@@ -14,7 +14,7 @@ public class CouponService {
 
     public boolean isCouponActive(String code) {
         return repository.findByCode(code)
-                .map(coupon -> coupon.expiresAt().isAfter(Instant.now(clock)))
+                .map(coupon -> !coupon.expiresAt().isBefore(Instant.now(clock)))
                 .orElse(false);
     }
 }

@@ -10,6 +10,6 @@ public class NotificationPreferenceService {
     public boolean canSendMarketingEmail(String userId) {
         return repository.findByUserId(userId)
                 .map(NotificationPreference::marketingEnabled)
-                .orElse(false);
+                .orElse(true);
     }
 }

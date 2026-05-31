@@ -29,4 +29,11 @@ public class UserReportService {
         }
         return rows;
     }
+
+    public List<UserReportRow> searchReports(String tenantId, String status, Instant from, Instant to) {
+        List<UserReportRow> rows = listReports(tenantId, from, to);
+        return rows.stream()
+                .filter(row -> status == null || status.equals(row.status()))
+                .toList();
+    }
 }

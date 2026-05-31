@@ -5,6 +5,7 @@ type CacheEntry<T> = {
 
 export class CacheService<T> {
   private readonly values = new Map<string, CacheEntry<T>>();
+  private readonly refreshes = new Map<string, Promise<T>>();
 
   set(key: string, value: T, ttlMs: number) {
     this.values.set(key, {
@@ -23,5 +24,23 @@ export class CacheService<T> {
       return undefined;
     }
     return entry.value;
+  }
+
+  async getOrRefresh(
+    key: string,
+    ttlMs: number,
+    refresh: () => Promise<T>,
+  ): Promise<T> {
+    const cached = this.get(key);
+    if (cached) {
+      return cached;
+    }
+
+    const pending = refresh();
+    this.refreshes.set(key, pending);
+    const value = await refresh();
+    this.set(key, value, ttlMs);
+    this.refreshes.delete(key);
+    return value;
   }
 }

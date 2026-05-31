@@ -21,15 +21,10 @@ export class OrderService {
 
   async pay(order: Order): Promise<Order> {
     await this.inventory.reserve(order.sku, order.quantity);
-    try {
-      await this.gateway.charge(order.id, order.amountCents);
-      return {
-        ...order,
-        status: "paid",
-      };
-    } catch (error) {
-      await this.inventory.release(order.sku, order.quantity);
-      throw error;
-    }
+    await this.gateway.charge(order.id, order.amountCents);
+    return {
+      ...order,
+      status: "paid",
+    };
   }
 }

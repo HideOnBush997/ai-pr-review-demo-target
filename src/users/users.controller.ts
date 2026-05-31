@@ -22,5 +22,6 @@ export function readMyProfile(accessToken: string) {
   return {
     userId: session.userId,
     role: session.role,
+    displayName: `User ${session.userId}`,
   };
 }
